@@ -27,12 +27,27 @@ namespace Proj7_1_Dudda
             // validation needed before we let the program continue
             if (HasValidInput())
             {
-                // if validation is successful, go ahead and do the math
-                decimal result = Calculate();
-                // then we output the result with four decimals.
-                txtResult.Text = result.ToString("n4");
+                // catching division by zero
+                try
+                {
+                    // if validation is successful, go ahead and do the math
+                    decimal result = Calculate();
+                    // then we output the result with four decimals.
+                    txtResult.Text = result.ToString("n4");
+                    // debugging: throw new Exception();
+                }
+                catch (DivideByZeroException)
+                {
+                    txtResult.Text = "undefined";
+                }
+                catch (Exception ex)
+                {
+                    // a generic catch-all in case anything else blows up
+                    string msg = ex.ToString();
+                    MessageBox.Show(msg);
+                }
             }
-        }
+        }  // end btnCalculate_Click handler
 
         // clear the box when text boxes are changed
         private void InputBox_TextChanged(object sender, EventArgs e)
@@ -40,8 +55,9 @@ namespace Proj7_1_Dudda
             txtResult.Text = "";
         }
 
-private bool HasValidInput()
-{
+        // validate all three input boxes
+        private bool HasValidInput()
+        {
             if (!ValidateOperand(txtOperand1.Text))
             {
                 MessageBox.Show("Please enter a number between 0 and 1,000,000 for Operand 1.");
@@ -61,16 +77,16 @@ private bool HasValidInput()
             {
                 return true;
             }
-}
+        }  // end method HasValidInput
 
         private decimal Calculate()
         {
-            // for now, just make sure we can get a result
+            // calculates the result of the operation on the two operands
             decimal operand1 = decimal.Parse(txtOperand1.Text);
             decimal operand2 = decimal.Parse(txtOperand2.Text);
             string op1 = txtOperator.Text;
             decimal result = 0m;
-           
+
             switch (op1)
             {
                 case "+":
@@ -86,11 +102,12 @@ private bool HasValidInput()
                     result = operand1 / operand2;
                     break;
                 default:
-                    // do nothing, we didn't get a valid operator
+                    // we didn't get a valid operator
+                    MessageBox.Show("Please enter a valid operator, which is one of these: + - * /");
                     break;
             }
             return result;
-        }
+        }  // end method Calculate
 
 
         // validate the operands
@@ -109,8 +126,8 @@ private bool HasValidInput()
         {
             decimal whatevs;  // disposable local variable to keep code from breaking
             if (decimal.TryParse(toCheck, out whatevs))
-            { 
-                return true; 
+            {
+                return true;
             }
             else { return false; }
         }
@@ -118,7 +135,7 @@ private bool HasValidInput()
         private bool IsValidData(string toCheck)
         {
             decimal someNumber = decimal.Parse(toCheck);
-            if (someNumber <= 0 || someNumber >= 1000000) 
+            if (someNumber < 0 || someNumber > 1000000)
             {
                 return false;
             }
@@ -131,6 +148,5 @@ private bool HasValidInput()
             return symbol == "+" || symbol == "-" || symbol == "*" || symbol == "/";
         }
 
-        
     } // end frmSimpleCalculator
 }
